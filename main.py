@@ -1,8 +1,12 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
-import discord
+import discord, re
 
-TOKEN = 'NDI3ODY1MjI5MTM3ODA1MzE4.DZsSfg.kd3RTgC-fR4jPy7nzocqVCH4rI4'
+with open("private.txt") as f:
+    content = f.readlines()
 
+for line in content:
+    TOKEN = re.search('Token:(.*)', line).group(1)
+    
 client = discord.Client()
 
 @client.event
