@@ -53,15 +53,15 @@ async def on_message(message):
             if die_limit <= 100 and times_to_roll <= 20:
                 dice_rolls = []
                 for roll in range(times_to_roll):
-                    if modifier is not None:
-                        dice_rolls.append(random.randint(1, die_limit) + modifier)
-                    else:
-                        dice_rolls.append(random.randint(1, die_limit))
+                    dice_rolls.append(random.randint(1, die_limit))
                 clean_roll = ""
+                combined_roll = 0
                 for roll in dice_rolls:
                     clean_roll = clean_roll + " " + str(roll)
-                if modifier:
-                    clean_roll = clean_roll + " (" + str(modifier) + ")"
+                    combined_roll = combined_roll + int(roll)
+                if modifier is not None:
+                    combined_roll = combined_roll + int(modifier)
+                clean_roll = clean_roll + " (" + str(combined_roll) + ")"
 
                 await client.send_message(message.channel, clean_roll)
         except:
