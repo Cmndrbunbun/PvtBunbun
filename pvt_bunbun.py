@@ -16,7 +16,7 @@ bot = commands.Bot(command_prefix='?', description="Test Bot by CmndrBunbun")
 @client.event
 async def on_message(message):
     # we do not want the bot to reply to itself
-    print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ")")
+    #print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ")")
 
     message_from_user = str(message.content)
     if message.author == client.user:
@@ -63,31 +63,24 @@ async def on_message(message):
         #Remove command string
         user_msg = message.content.strip("!roll ")
         #Format <int>d<int>
-        pattern = '(\d+)\s*d\s*(\d+)\s*\+?\s*(\d*)'
+        pattern = '(\d+)\s*d\s*(\d+)(\s*[+-]\s*\d+)?'
         try:
             #Pull the amount of dice and then the max roll
             dice_match = re.match(pattern, user_msg)
             times_to_roll = int(dice_match[1])
             die_limit = int(dice_match[2])
-            if dice_match[3]:
-                modifier = int(dice_match[3])
-            else:
-                modifier = None
+            modifier = dice_match[3]
+            if modifier is None:
+                modifier = "+0"
             if die_limit <= 100 and times_to_roll <= 20:
                 dice_rolls = []
                 for roll in range(times_to_roll):
                     dice_rolls.append(random.randint(1, die_limit))
-                clean_roll = ""
-                combined_roll = 0
-                for roll in dice_rolls:
-                    ret_msg = ret_msg + " " + str(roll)
-                    combined_roll = combined_roll + int(roll)
-                if modifier is not None:
-                    combined_roll = combined_roll + int(modifier)
-                ret_msg = ret_msg + " (" + str(combined_roll) + ")"
-
+                total_roll = str(eval(str(sum(dice_rolls)) + modifier))
+                modifier = eval(modifier)
+                ret_msg = "Range [" + str(times_to_roll + modifier) + ":" + str(times_to_roll * die_limit + modifier) + "]\nRolls " + str(dice_rolls) + "\nTotal " + total_roll
                 await client.send_message(message.channel, ret_msg)
-        except:
+        except TypeError:
             ret_msg = "Incorrect Format.  !roll <int>d<int> [+ int]"
             await client.send_message(message.channel, ret_msg)
 
