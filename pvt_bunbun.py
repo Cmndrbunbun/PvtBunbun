@@ -24,15 +24,15 @@ async def on_message(message):
         await client.send_message(message.channel, ret_msg)
 
     if message.content.startswith('!smite'):
-        ret_msg = "竜が我が敵を食らう!"
-        await client.send_message(message.channel, msg)
-        ret_msg = "http://bit.ly/2qwXh5F"
+        ret_msg = "竜が我が敵を食らう!\nhttps://gph.is/2pMNtmz"
         await client.send_message(message.channel, ret_msg)
 
     if message.content.startswith('!reflect'):
-        ret_msg = "竜神の剣をくらえ!"
+        ret_msg = "竜神の剣をくらえ!\nhttps://gph.is/2J1G8Ze"
         await client.send_message(message.channel, ret_msg)
-        ret_msg= "http://bit.ly/2qXxQMa"
+
+    if message.content.startswith('!pewpew'):
+        ret_msg = "https://gph.is/2IZHG62"
         await client.send_message(message.channel, ret_msg)
 
     #Responds to !roll and captures the xdx after to roll a certain amount of dice limited by 20 dice and 100 max limit
@@ -40,18 +40,30 @@ async def on_message(message):
         #Remove command string
         user_msg = message.content.strip("!roll ")
         #Format <int>d<int>
-        pattern = '(\d+)d(\d+)'
-
+        pattern = '(\d+)\s*d\s*(\d+)\s*\+?\s*(\d*)'
         try:
             #Pull the amount of dice and then the max roll
             dice_match = re.match(pattern, user_msg)
             times_to_roll = int(dice_match.group(1))
             die_limit = int(dice_match.group(2))
+            if dice_match.group(3):
+                modifier = int(dice_match.group(3))
+            else:
+                modifier = None
             if die_limit <= 100 and times_to_roll <= 20:
                 dice_rolls = []
                 for roll in range(times_to_roll):
-                    dice_rolls.append(random.randint(1, die_limit))
-                await client.send_message(message.channel, dice_rolls)
+                    if modifier is not None:
+                        dice_rolls.append(random.randint(1, die_limit) + modifier)
+                    else:
+                        dice_rolls.append(random.randint(1, die_limit))
+                clean_roll = ""
+                for roll in dice_rolls:
+                    clean_roll = clean_roll + " " + str(roll)
+                if modifier:
+                    clean_roll = clean_roll + " (" + str(modifier) + ")"
+
+                await client.send_message(message.channel, clean_roll)
         except:
             ret_msg = "Incorrect Format.  !roll <int>d<int>"
             await client.send_message(message.channel, ret_msg)
