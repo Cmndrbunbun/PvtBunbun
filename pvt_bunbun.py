@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 
-import discord, re, random
+import discord, re, random, more_commands
 from discord.ext import commands
 
 with open("private.txt") as f:
@@ -16,12 +16,14 @@ bot = commands.Bot(command_prefix='?', description="Test Bot by CmndrBunbun")
 @client.event
 async def on_message(message):
     # we do not want the bot to reply to itself
-    #print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ")")
+    print()
+    print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ")")
 
     message_from_user = str(message.content)
     if message.author == client.user:
         return
 
+    #Eventually will combine all the "startwith" stuff and move it to another file.
     if message_from_user.startswith('!hello'):
         ret_msg = 'Hello {0.author.mention}'.format(message)
         await client.send_message(message.channel, ret_msg)
@@ -38,24 +40,37 @@ async def on_message(message):
         ret_msg = "https://gph.is/2IZHG62"
         await client.send_message(message.channel, ret_msg)
 
-    if re.search("haha", message_from_user, re.IGNORECASE):
-        ret_msg = "https://gph.is/2Flp8en"
-        await client.send_message(message.channel, ret_msg)
-
-    if re.search("dang", message_from_user, re.IGNORECASE):
-        if random.randint(1,2) == 1:
-            gif = "https://i.imgur.com/BI0qaev.gif"
-        else:
-            gif = "https://i.imgur.com/Pp4MV32.gif"
-        ret_msg = "STOP HERETIC, THIS IS A CHRISTIAN SERVER!\n"+ gif
-        await client.send_message(message.channel, ret_msg)
-
-    if message_from_user.startswith('!permissions'):
+    if message_from_user.startswith('!roles'):
         ret_msg = ""
         for role in message.author.roles:
             ret_msg = ret_msg + " " + str(role)
         ret_msg = ret_msg.replace("@everyone", "")
         await client.send_message(message.channel, ret_msg)
+
+    if message_from_user.startswith('!clear'):
+        auth = more_commands.auth_user(message.author.roles)
+        if auth:
+            user_msg = message.content.strip("!clear ")
+            try:
+                print("here1")
+                print(user_msg)
+                messages_to_delete = int((re.match("(\d+)", user_msg))[1])
+                print("here2")
+                max_delete = 5
+                if messages_to_delete <= max_delete and messages_to_delete >= 2:
+                    mgs = []
+                    async for x in client.logs_from(message.channel, limit = messages_to_delete):
+                        mgs.append(x)
+                    await client.delete_messages(mgs)
+                    ret_msg = ""
+                else:
+                    ret_msg = "Limit Reached.  Please limit deletion to " + str(max_delete) + " entries."
+            except TypeError:
+                ret_msg = "No Number Given. !clear <int>"
+        else:
+            ret_msg = "Incorrect Role.  Please do not run unauthorized commands."
+        if ret_msg is not "":
+            await client.send_message(message.channel, ret_msg)
 
 
     #Responds to !roll and captures the xdx after to roll a certain amount of dice limited by 20 dice and 100 max limit
@@ -83,6 +98,24 @@ async def on_message(message):
         except TypeError:
             ret_msg = "Incorrect Format.  !roll <int>d<int> [+ int]"
             await client.send_message(message.channel, ret_msg)
+
+
+    #Eventually will combine all the "search" stuff and move it to another file.
+    if re.search("haha", message_from_user, re.IGNORECASE):
+        ret_msg = "https://gph.is/2Flp8en"
+        await client.send_message(message.channel, ret_msg)
+
+    if re.search("dang", message_from_user, re.IGNORECASE):
+        if random.randint(1,2) == 1:
+            gif = "https://i.imgur.com/BI0qaev.gif"
+        else:
+            gif = "https://i.imgur.com/Pp4MV32.gif"
+        ret_msg = "STOP HERETIC, THIS IS A CHRISTIAN SERVER!\n"+ gif
+        await client.send_message(message.channel, ret_msg)
+
+    if re.search("good bot", message_from_user, re.IGNORECASE):
+        ret_msg = "{0.author.mention}".format(message) + " " + more_commands.good_bot()
+        await client.send_message(message.channel, ret_msg)
 
 
 @client.event
