@@ -1,17 +1,17 @@
 #!/usr/bin/python
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 
-import discord, re, random, more_commands
+import discord, re, random, more_commands, zalgo
 from discord.ext import commands
 
-with open("private.txt") as f:
+with open("various_text/private.txt") as f:
     content = f.readlines()
 
 for line in content:
     TOKEN = re.search('Token:(.*)', line).group(1)
 
 client = discord.Client()
-bot = commands.Bot(command_prefix='?', description="Test Bot by CmndrBunbun")
+bot = commands.Bot(command_prefix='?', description="Discord Bot by CmndrBunbun")
 
 @client.event
 async def on_message(message):
@@ -52,10 +52,7 @@ async def on_message(message):
         if auth:
             user_msg = message.content.strip("!clear ")
             try:
-                print("here1")
-                print(user_msg)
                 messages_to_delete = int((re.match("(\d+)", user_msg))[1])
-                print("here2")
                 max_delete = 5
                 if messages_to_delete <= max_delete and messages_to_delete >= 2:
                     mgs = []
@@ -117,6 +114,21 @@ async def on_message(message):
         ret_msg = "{0.author.mention}".format(message) + " " + more_commands.good_bot()
         await client.send_message(message.channel, ret_msg)
 
+    if re.search("bad bot", message_from_user, re.IGNORECASE):
+        message_owner = re.sub("\#\d+", "" , str(message.author))
+        bot_message = str(more_commands.good_bot())
+        padding_length = int(len(bot_message) / 1.5)
+        ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\n" + message_owner + " " + bot_message + "\n" + more_commands.random_string(padding_length))
+        await client.send_message(message.channel, ret_msg)
+
+    if re.search("zalgo", message_from_user, re.IGNORECASE):
+        message_from_user = re.sub("zalgo", "", message_from_user, re.IGNORECASE)
+        padding_length = int(len(message_from_user) / 1.5)
+        if len(message_from_user) > 1:
+            ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\n" + message_from_user + "\n" + more_commands.random_string(padding_length))
+        else:
+            ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\nTHE ANCIENT ONE STIRS, HE COMES HE COMES\n" + more_commands.random_string(padding_length))
+        await client.send_message(message.channel, ret_msg)
 
 @client.event
 async def on_ready():
