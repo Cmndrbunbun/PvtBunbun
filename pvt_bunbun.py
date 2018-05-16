@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 
-import discord, re, random
-import sys
-sys.path.insert(0, '/code_library')
-import more_commands, zalgo
+import discord, re, random, more_commands, zalgo
 from discord.ext import commands
 
 with open("various_text/private.txt") as f:
@@ -20,48 +17,41 @@ bot = commands.Bot(command_prefix='?', description="Discord Bot by CmndrBunbun")
 async def on_message(message):
     # we do not want the bot to reply to itself
     print()
-    print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ")")
+    print("(" + message.content + ")" + " in channel (" + str(message.channel) + ") on server (" + str(message.server) + ") by user (" + str(message.author) + ")")
 
     message_from_user = str(message.content)
     if message.author == client.user:
         return
-
-    if starts_with(message_from_user, author) == False:
-        STUFF
 
     if message_from_user.startswith('!'):
         #Eventually will combine all the "startwith" stuff and move it to another file.
         if message_from_user.startswith('!hello'):
             ret_msg = 'Hello {0.author.mention}'.format(message)
             await client.send_message(message.channel, ret_msg)
-
-        if message_from_user.startswith('!smite'):
+        elif message_from_user.startswith('!smite'):
             ret_msg = "竜が我が敵を食らう!\nhttps://gph.is/2pMNtmz"
             await client.send_message(message.channel, ret_msg)
-
-        if message_from_user.startswith('!reflect'):
+        elif message_from_user.startswith('!reflect'):
             ret_msg = "竜神の剣をくらえ!\nhttps://gph.is/2J1G8Ze"
             await client.send_message(message.channel, ret_msg)
-
-        if message_from_user.startswith('!pewpew'):
+        elif message_from_user.startswith('!pewpew'):
             ret_msg = "https://gph.is/2IZHG62"
             await client.send_message(message.channel, ret_msg)
-
-        if message_from_user.startswith('!roles'):
+        elif message_from_user.startswith('!roles'):
             ret_msg = ""
             for role in message.author.roles:
                 ret_msg = ret_msg + " " + str(role)
             ret_msg = ret_msg.replace("@everyone", "")
             await client.send_message(message.channel, ret_msg)
-
-        if message_from_user.startswith('!clear'):
+        elif message_from_user.startswith('!clear'):
             auth = more_commands.auth_user(message.author.roles)
             if auth:
                 user_msg = message.content.strip("!clear ")
                 try:
                     messages_to_delete = int((re.match("(\d+)", user_msg))[1])
                     max_delete = 5
-                    if messages_to_delete <= max_delete and messages_to_delete >= 2:
+                    if messages_to_delete <= max_delete and messages_to_delete >= 1:
+                        messages_to_delete += 1
                         mgs = []
                         async for x in client.logs_from(message.channel, limit = messages_to_delete):
                             mgs.append(x)
@@ -75,10 +65,8 @@ async def on_message(message):
                 ret_msg = "Incorrect Role.  Please do not run unauthorized commands."
             if ret_msg is not "":
                 await client.send_message(message.channel, ret_msg)
-
-
         #Responds to !roll and captures the xdx after to roll a certain amount of dice limited by 20 dice and 100 max limit
-        if message_from_user.startswith('!roll'):
+        elif message_from_user.startswith('!roll'):
             #Remove command string
             user_msg = message.content.strip("!roll ")
             #Format <int>d<int>
@@ -102,10 +90,18 @@ async def on_message(message):
             except TypeError:
                 ret_msg = "Incorrect Format.  !roll <int>d<int> [+ int]"
                 await client.send_message(message.channel, ret_msg)
-
+        else:
+            ret_msg = "No correct command was given"
+            await client.send_message(message.channel, ret_msg)
     else:
-        ret_msg = search_text(message_from_user)
-        await client.send_message(message.channel, ret_msg)
+        try:
+            ret_msg = more_commands.search_text(message_from_user, message.author)
+            await client.send_message(message.channel, ret_msg)
+        except Exception as err:
+            if '400' in str(err):
+                return
+            else:
+                print("It broke Jim")
 
 
 @client.event

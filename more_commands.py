@@ -1,6 +1,4 @@
-import discord, random
-sys.path.insert(0, '/code_library')
-import more_commands, zalgo
+import discord, random, re, zalgo
 
 def good_bot():
     responses = []
@@ -25,36 +23,27 @@ def random_string(length):
         string_of_chars = string_of_chars + " " + (str(chr(random.randint(32, 126))))
     return string_of_chars
 
-def search_text(text):
+def search_text(text, author):
     #Eventually will combine all the "search" stuff and move it to another file.
     if re.search("haha", text, re.IGNORECASE):
-        ret_msg = "https://gph.is/2Flp8en"
-        await client.send_message(message.channel, ret_msg)
-
-    if re.search("dang", text, re.IGNORECASE):
+        return "https://gph.is/2Flp8en"
+    elif re.search("dang", text, re.IGNORECASE):
         if random.randint(1,2) == 1:
             gif = "https://i.imgur.com/BI0qaev.gif"
         else:
             gif = "https://i.imgur.com/Pp4MV32.gif"
-        ret_msg = "STOP HERETIC, THIS IS A CHRISTIAN SERVER!\n"+ gif
-        await client.send_message(message.channel, ret_msg)
-
-    if re.search("good bot", text, re.IGNORECASE):
-        ret_msg = more_commands.good_bot()
-        await client.send_message(message.channel, ret_msg)
-
-    if re.search("bad bot", text, re.IGNORECASE):
-        message_owner = re.sub("\#\d+", "" , str(message.author))
-        bot_message = str(more_commands.good_bot())
+        return "STOP HERETIC, THIS IS A CHRISTIAN SERVER!\n" + gif
+    elif re.search("good bot", text, re.IGNORECASE):
+        return good_bot()
+    elif re.search("bad bot", text, re.IGNORECASE):
+        message_owner = re.sub("\#\d+", "" , str(author))
+        bot_message = str(good_bot())
         padding_length = int(len(bot_message) / 1.5)
-        ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\n" + message_owner + " " + bot_message + "\n" + more_commands.random_string(padding_length))
-        await client.send_message(message.channel, ret_msg)
-
-    if re.search("zalgo", text, re.IGNORECASE):
-        message_from_user = re.sub("zalgo", "", message_from_user, re.IGNORECASE)
+        return zalgo.zalgo(1, random_string(padding_length) + "\n" + message_owner + " " + bot_message + "\n" + random_string(padding_length))
+    elif re.search("zalgo", text, re.IGNORECASE):
+        message_from_user = re.sub("zalgo", "", text, re.IGNORECASE)
         padding_length = int(len(message_from_user) / 1.5)
         if len(message_from_user) > 1:
-            ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\n" + message_from_user + "\n" + more_commands.random_string(padding_length))
+            return zalgo.zalgo(1, random_string(padding_length) + "\n" + message_from_user + "\n" + random_string(padding_length))
         else:
-            ret_msg = zalgo.zalgo(1, more_commands.random_string(padding_length) + "\nTHE ANCIENT ONE STIRS, HE COMES HE COMES\n" + more_commands.random_string(padding_length))
-        await client.send_message(message.channel, ret_msg)
+            return zalgo.zalgo(1, random_string(padding_length) + "\nTHE ANCIENT ONE STIRS, HE COMES HE COMES\n" + random_string(padding_length))
