@@ -1,4 +1,4 @@
-import discord, random, re, zalgo
+import discord, re, random, zalgo
 
 def good_bot():
     responses = []
@@ -47,3 +47,45 @@ def search_text(text, author):
             return zalgo.zalgo(1, random_string(padding_length) + "\n" + message_from_user + "\n" + random_string(padding_length))
         else:
             return zalgo.zalgo(1, random_string(padding_length) + "\nTHE ANCIENT ONE STIRS, HE COMES HE COMES\n" + random_string(padding_length))
+
+def run_command(text, author):
+    #Eventually will combine all the "startwith" stuff and move it to another file.
+    if text.startswith('!hello'):
+        return 'Hello {0.author.mention}'.format(text)
+    elif text.startswith('!smite'):
+        return "竜が我が敵を食らう!\nhttps://gph.is/2pMNtmz"
+    elif text.startswith('!reflect'):
+        return "竜神の剣をくらえ!\nhttps://gph.is/2J1G8Ze"
+    elif text.startswith('!pewpew'):
+        return "https://gph.is/2IZHG62"
+    elif text.startswith('!roles'):
+        ret_msg = ""
+        for role in author.roles:
+            ret_msg = ret_msg + " " + str(role)
+        ret_msg = ret_msg.replace("@everyone", "")
+        return ret_msg
+    #Responds to !roll and captures the xdx after to roll a certain amount of dice limited by 20 dice and 100 max limit
+    elif text.startswith('!roll'):
+        #Remove command string
+        user_msg = text.strip("!roll ")
+        #Format <int>d<int>
+        pattern = '(\d+)\s*d\s*(\d+)(\s*[+-]\s*\d+)?'
+        try:
+            #Pull the amount of dice and then the max roll
+            dice_match = re.match(pattern, user_msg)
+            times_to_roll = int(dice_match[1])
+            die_limit = int(dice_match[2])
+            modifier = dice_match[3]
+            if modifier is None:
+                modifier = "+0"
+            if die_limit <= 100 and times_to_roll <= 20:
+                dice_rolls = []
+                for roll in range(times_to_roll):
+                    dice_rolls.append(random.randint(1, die_limit))
+                total_roll = str(eval(str(sum(dice_rolls)) + modifier))
+                modifier = eval(modifier)
+                return "Range [" + str(times_to_roll + modifier) + ":" + str(times_to_roll * die_limit + modifier) + "]\nRolls " + str(dice_rolls) + "\nTotal " + total_roll
+        except TypeError:
+            return "Incorrect Format.  !roll <int>d<int> [+ int]"
+    else:
+        return "No correct command was given"
