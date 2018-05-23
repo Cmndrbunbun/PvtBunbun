@@ -1,4 +1,5 @@
 import discord, re, random, zalgo
+from riotwatcher import RiotWatcher
 
 def good_bot():
     responses = []
@@ -87,5 +88,18 @@ def run_command(text, author):
                 return "Range [" + str(times_to_roll + modifier) + ":" + str(times_to_roll * die_limit + modifier) + "]\nRolls " + str(dice_rolls) + "\nTotal " + total_roll
         except TypeError:
             return "Incorrect Format.  !roll <int>d<int> [+ int]"
+    elif text.startswith('!riot'):
+        #Input = !riot SUMMONER_NAME REGION
+        with open("various_text/riot.txt") as f:
+            content = f.readlines()
+        #Pull secret from a hidden txt file.  Not best practice, but better than plain text.
+        for line in content:
+            KEY = re.search('Riot:(.*)', line).group(1)
+        watcher = RiotWatcher(KEY)
+        region = 'na1'
+        user_msg = text.strip("!riot ")
+        summoner = watcher.summoner.by_name(region, user_msg)
+        ranked_stats = watcher.league.positions_by_summoner(region, summoner['id'])
+        return str(summoner) + "\n\n" + str(ranked_stats)
     else:
         return "No correct command was given"

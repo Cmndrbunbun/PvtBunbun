@@ -33,7 +33,7 @@ async def on_message(message):
         await client.send_message(message.channel, more_commands.run_command(message_from_user, message.author))
     else:
         try:
-            await client.send_message(message.channel, more_commands.search_text(message_from_user, message.author)
+            await client.send_message(message.channel, more_commands.search_text(message_from_user, message.author))
         except Exception as err:
             if '400' in str(err):
                 return
