@@ -91,7 +91,7 @@ def run_command(text, author):
                     return "Range [" + str(times_to_roll + modifier) + ":" + str(times_to_roll * die_limit + modifier) + "]\nRolls " + str(dice_rolls) + "\nTotal " + total_roll
         except TypeError:
             if user_msg == "":
-                return "Range [a:20]\nRoll " + str(random.randint(1, 20))
+                return "Range [1:20]\nRoll " + str(random.randint(1, 20))
             return "Incorrect Format.  !roll <int>d<int> [+ int]"
     elif text.startswith('!riot'):
         #Input = !riot SUMMONER_NAME REGION
